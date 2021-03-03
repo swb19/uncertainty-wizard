@@ -1,6 +1,6 @@
 import gc
 from dataclasses import dataclass
-from typing import Dict, Tuple, Union
+from typing import Dict, Tuple, Union, Optional
 
 import numpy as np
 import tensorflow as tf
@@ -16,7 +16,7 @@ class DataLoadedPredictor:
 
     x_test: np.ndarray
     batch_size: int
-    steps: int = None
+    steps: Optional[int] = None
 
     def __call__(self, model_id: int, model: tf.keras.Model):
         """Simple call to keras predict, formulated as __call__ to allow for constructor params."""
@@ -32,21 +32,21 @@ class NumpyFitProcess:
     which are then used in the keras fit process.
     """
 
-    x: Union[str, np.ndarray] = None
-    y: Union[str, np.ndarray] = None
-    batch_size: int = None
+    x: Optional[Union[str, np.ndarray]] = None
+    y: Optional[Union[str, np.ndarray]] = None
+    batch_size: Optional[int] = None
     epochs: int = 1
     verbose: int = 1
     # Callbacks not supported in this default process (as type does not guarantee picklability)
     # callbacks = None,
     validation_split: float = 0.0
-    validation_data: Union[Tuple[str, str], Tuple[np.ndarray, np.ndarray]] = None
+    validation_data: Optional[Union[Tuple[str, str], Tuple[np.ndarray, np.ndarray]]] = None
     shuffle: bool = True
-    class_weight: Dict[int, float] = None
-    sample_weight: np.ndarray = None
+    class_weight: Optional[Dict[int, float]] = None
+    sample_weight: Optional[np.ndarray] = None
     initial_epoch: int = 0
-    steps_per_epoch: int = None
-    validation_steps: int = None
+    steps_per_epoch: Optional[int] = None
+    validation_steps: Optional[int] = None
     validation_freq: int = 1
 
     # Max_queue_size, workers and use_multiprocessing not supported as we force input to be numpy array
@@ -67,7 +67,8 @@ class NumpyFitProcess:
             val_y = np.load(self.validation_data[1], allow_pickle=True)
             val_data = (val_x, val_y)
         else:
-            val_data = self.validation_data
+            # Ignore type as it is explicitly checked above
+            val_data = self.validation_data  # type: ignore
         history = model.fit(
             x=x,
             y=y,

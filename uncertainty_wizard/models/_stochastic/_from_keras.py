@@ -1,4 +1,5 @@
 import shutil
+from typing import Type
 
 import tensorflow as tf
 
@@ -78,6 +79,7 @@ def stochastic_from_keras(
     shutil.rmtree(temp_weights_path, ignore_errors=True)
 
     # Put the wrapper around the new model
+    target_class: Type[Stochastic]
     if isinstance(model, tf.keras.models.Sequential):
         target_class = StochasticSequential
     else:
